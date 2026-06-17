@@ -1,0 +1,249 @@
+-- Abax Protheus
+
+SELECT --
+DISTINCT '0' OK,
+         'Abax Protheus' SISTEMA,
+         A.A01_ID ID, --DOC.ID,
+         FORMAT(DOC.DATAULTIMAATUALIZACAO, 'dd/MM/yyyy HH:mm:ss') DATAULTIMAATUALIZACAO,
+         DOC.CODFILIAL COD_FILIAL,
+         C.C02_CNPJ CNPJ_EMITENTE,
+         C.C03_XNOME NOME_EMITENTE,
+         E.E02_CNPJ CNPJ_FILIAL,
+         E.E04_XNOME NOME_FILIAL,
+         W2.W16_VNF VALOR,
+         B.B08_NNF NF,
+         Z.Z03_INFCPL INFORMACOES_COMPL,
+         FORMAT(B.B09_DEMI, 'dd/MM/yyyy') EMISSAO,
+         FORMAT(B.B09_DEMI, 'MM/yyyy') MESANO,
+         FORMAT(B.B09_DEMI, 'yyyy') ANO,
+         UPPER(B.B04_NATOP) NATUREZA_OPERACAO,
+         CONVERT(VARCHAR, DOC.DATA1VENCIMENTO, 103) DATA_1VENCIMENTO,
+         SUBSTRING(A.A03_ID, 4, LEN(A.A03_ID)) CHAVE_DEACESSO,
+         CASE
+           WHEN STATUS LIKE '%______03____________________________________________________________________________________________' THEN
+            'Fornecedor Cadastrado no ERP'
+           WHEN STATUS LIKE '%______04____________________________________________________________________________________________' THEN
+            'Fornecedor Não Cadastrado no ERP'
+           WHEN STATUS LIKE '%______87____________________________________________________________________________________________' THEN
+            'Fornecedor Bloqueado'
+           WHEN STATUS LIKE '%______71____________________________________________________________________________________________' THEN
+            'Fornecedor Bloqueado'
+           ELSE
+            'Sem informações'
+         END BANDEIRA_FORNECEDOR,
+         CASE
+           WHEN STATUS LIKE '%____38______________________________________________________________________________________________' THEN
+            'Erro não catalogado'
+           WHEN STATUS LIKE '%____01______________________________________________________________________________________________' THEN
+            'NFe Autorizada na Sefaz'
+           WHEN STATUS LIKE '%____02______________________________________________________________________________________________' THEN
+            'NFe Não Autorizada na Sefaz'
+           WHEN STATUS LIKE '%____75______________________________________________________________________________________________' THEN
+            'Verifique o Status da Nota no Site da Sefaz'
+           WHEN STATUS LIKE '%____65______________________________________________________________________________________________' THEN
+            'NFE não consta na Sefaz'
+           WHEN STATUS LIKE '%____66______________________________________________________________________________________________' THEN
+            'Erro no Certificado Digital'
+           WHEN STATUS LIKE '%____BF______________________________________________________________________________________________' THEN
+            'Código Diferente'
+           ELSE
+            'Sem informações'
+         END BANDEIRA_SEFAZ,
+         CONVERT(VARCHAR, DOC.STATUSSEFAZ_DATACONSULTA, 103) + ' ' + CONVERT(VARCHAR(5), DOC.STATUSSEFAZ_DATACONSULTA, 108) STATUSSEFAZ_DATACONSULTA,
+         DOC.STATUSSEFAZ,
+         CASE
+           WHEN DOC.STATUSSEFAZ = 9999 THEN
+            'Erro não catalogado'
+           WHEN DOC.STATUSSEFAZ = 100 THEN
+            'Autorizado o uso da NF-e'
+           WHEN DOC.STATUSSEFAZ IS NULL THEN
+            'Código diferente do padrão'
+           ELSE
+            'Desconhecido'
+         END STATUSSEFAZ_DESCRICAO,
+         CASE
+           WHEN STATUS LIKE '%____________________________35______________________________________________________________________' THEN
+            'Tipo de NFE exige ordem de compra'
+           WHEN STATUS LIKE '%____________________________34______________________________________________________________________' THEN
+            'Tipo de NFE não exige ordem de compra'
+           WHEN STATUS LIKE '%____________________________86______________________________________________________________________' THEN
+            'Tipo de NFE exige documento vinculado'
+           WHEN STATUS LIKE '%____________________________92______________________________________________________________________' THEN
+            'Tipo de NFE é transferência'
+           ELSE
+            'Sem informações'
+         END BANDEIRA_CFOP,
+         A.CFOPSAIDA CFOP,
+         CASE
+           WHEN STATUS LIKE '%________AI__________________________________________________________________________________________' THEN
+            'Status não utilizado'
+           WHEN STATUS LIKE '%________05__________________________________________________________________________________________' THEN
+            'Ordem vinculada sem pendências'
+           WHEN STATUS LIKE '%________06__________________________________________________________________________________________' THEN
+            'Ordem não vinculada'
+           WHEN STATUS LIKE '%________GU__________________________________________________________________________________________' THEN
+            'Recebimento Parcial'
+           WHEN STATUS LIKE '%________74__________________________________________________________________________________________' THEN
+            'Status não utilizado'
+           WHEN STATUS LIKE '%________70__________________________________________________________________________________________' THEN
+            'Ordem com pendências'
+           ELSE
+            'Sem informações'
+         END BANDEIRA_ORDEM,
+         CASE
+           WHEN STATUS LIKE '%__________________________________________________AG________________________________________________' THEN
+            'Sem necessidade de lançamento de contagem'
+           WHEN STATUS LIKE '%__________________________________________________59________________________________________________' THEN
+            'Contagem da mercadoria realizada'
+           WHEN STATUS LIKE '%__________________________________________________60________________________________________________' THEN
+            'Contagem da mercadoria não realizada'
+           WHEN STATUS LIKE '%__________________________________________________OB________________________________________________' THEN
+            'OC Bloqueada'
+           ELSE
+            'Sem informações'
+         END BANDEIRA_CONTAGEM,
+         CASE
+           WHEN STATUS LIKE '%______________________________________45____________________________________________________________' THEN
+            'Material foi Recebido'
+           WHEN STATUS LIKE '%______________________________________46____________________________________________________________' THEN
+            'Material não foi Recebido'
+           WHEN STATUS LIKE '%______________________________________AF____________________________________________________________' THEN
+            'Não há necessidade de receber material'
+           ELSE
+            'Sem informações'
+         END BANDEIRA_MATERIALRECEBIDO,
+         CASE
+           WHEN STATUS LIKE '%____________________________________AL______________________________________________________________' THEN
+            'Sem ação'
+           WHEN STATUS LIKE '%____________________________________43______________________________________________________________' THEN
+            'NFE Registrada via Ábax'
+           WHEN STATUS LIKE '%____________________________________68______________________________________________________________' THEN
+            'NFE Não registrada via Ábax'
+           WHEN STATUS LIKE '%____________________________________76______________________________________________________________' THEN
+            'Aguardando Processamento'
+           WHEN STATUS LIKE '%____________________________________69______________________________________________________________' THEN
+            'Problema na exportação'
+           WHEN STATUS LIKE '%____________________________________97______________________________________________________________' THEN
+            'Sem informações'
+           WHEN STATUS LIKE '%____________________________________AA______________________________________________________________' THEN
+            'Nota registrada como pré nota'
+           WHEN STATUS LIKE '%____________________________________44______________________________________________________________' THEN
+            'NFE Não Registrada'
+           WHEN STATUS LIKE '%____________________________________98______________________________________________________________' THEN
+            'Nota registrada com valor errado'
+           WHEN STATUS LIKE '%____________________________________99______________________________________________________________' THEN
+            'Nota registrada com data de emissão errada'
+           ELSE
+            'Sem informações'
+         END BANDEIRA_RMREG,
+         CASE
+           WHEN STATUS LIKE '%______________________________________________AO____________________________________________________' THEN
+            'Sem ação'
+           WHEN STATUS LIKE '%______________________________________________53____________________________________________________' THEN
+            'Regra fiscal válida'
+           WHEN STATUS LIKE '%______________________________________________55____________________________________________________' THEN
+            'Não encontrou regra fiscal'
+           WHEN STATUS LIKE '%______________________________________________73____________________________________________________' THEN
+            'Vários movimentos encontrados'
+           ELSE
+            'Sem informações'
+         END BANDEIRA_REGRA
+
+  FROM ZDW_A01_INFNFE A
+  JOIN ZDW_B01_IDE B ON (B.A01_ID = A.A01_ID)
+  JOIN DOCUMENTO DOC ON (DOC.ID = A.IDDOCUMENTO)
+  JOIN ZDW_C01_EMIT C ON (C.A01_ID = A.A01_ID)
+  JOIN ZDW_E01_DEST E ON (E.A01_ID = A.A01_ID)
+  LEFT JOIN ANOMALIA AN ON (DOC.IDANOMALIA = AN.ID)
+  LEFT OUTER JOIN ZDW_E05_ENDERDEST E5 ON (E5.E01_ID = E.E01_ID)
+  LEFT OUTER JOIN ZDW_W01_TOTAL W1 ON (W1.A01_ID = A.A01_ID)
+  LEFT OUTER JOIN ZDW_W02_ICMSTOT W2 ON (W2.W01_ID = W1.W01_ID)
+  LEFT OUTER JOIN ZDW_W03_IBSCBSTOT IB ON (IB.A01_ID = A.A01_ID)
+  LEFT OUTER JOIN ZDW_H01_DET H01 ON (H01.A01_ID = A.A01_ID)
+  LEFT OUTER JOIN ZDW_M01_IMPOSTO M01 ON (M01.H01_ID = H01.H01_ID)
+  LEFT OUTER JOIN ZDW_N01_ICMS N01 ON (N01.M01_ID = M01.M01_ID)
+  LEFT OUTER JOIN ZDW_N10C_ICMSSN101 N10C ON (N10C.N01_ID = N01.N01_ID)
+  LEFT OUTER JOIN ZDW_N10E_ICMSSN201 N10E ON (N10E.N01_ID = N01.N01_ID)
+  LEFT OUTER JOIN DEPARA_VINCULO DV ON (DOC.ID = DV.ID_DOCUMENTO)
+  LEFT OUTER JOIN REGRAFISCAL R ON (DV.ID = R.ID_DEPARA)
+  LEFT OUTER JOIN ZDW_Z01_INFADIC Z ON (Z.A01_ID = A.A01_ID)
+ WHERE TIPODOCUMENTO <> 2
+   AND ((STATUS LIKE '%______03____________________________________________________________________________________________' OR
+       STATUS LIKE '%______04____________________________________________________________________________________________' OR
+       STATUS LIKE '%______87____________________________________________________________________________________________') AND
+       (STATUS LIKE '%____01______________________________________________________________________________________________' OR
+       STATUS LIKE '%____38______________________________________________________________________________________________' OR
+       STATUS LIKE '%____75______________________________________________________________________________________________' OR
+       STATUS LIKE '%____65______________________________________________________________________________________________' OR
+       STATUS LIKE '%____66______________________________________________________________________________________________' OR
+       STATUS LIKE '%____BF______________________________________________________________________________________________') AND
+       (STATUS LIKE '%____________________________________44______________________________________________________________' OR
+       STATUS LIKE '%____________________________________76______________________________________________________________' OR
+       STATUS LIKE '%____________________________________69______________________________________________________________' OR
+       STATUS LIKE '%____________________________________AA______________________________________________________________' OR
+       STATUS LIKE '%____________________________________SS______________________________________________________________' OR
+       STATUS LIKE '%____________________________________AL______________________________________________________________') AND
+       (STATUS LIKE '%____________________________35______________________________________________________________________'))
+   AND B.B11_TPNF = 1
+   AND B.B09_DEMI BETWEEN '20251101 00:00:00' AND '20260519 23:59:59'
+   AND (DOC.NOTA_RESTRITA = 'N' OR ISNULL(DOC.NOTA_RESTRITA, '') = '')
+   AND (DOC.MODULO = 'INBOUND' OR ISNULL(DOC.MODULO, '') = '')
+ GROUP BY DOC.ID,
+          A.IDDOCUMENTO,
+          A.A03_ID,
+          DOC.STATUSSEFAZ_DATACONSULTA,
+          DOC.DATAREGISTROERP,
+          DOC.DATA1VENCIMENTO,
+          B.B09_DEMI,
+          DOC.STATUS,
+          W2.W16_VNF,
+          DOC.STATUSSEFAZ,
+          DOC.ID,
+          B.B02_CUF,
+          B.B07_SERIE,
+          B.B08_NNF,
+          AN.NOME,
+          DOC.CODFILIAL,
+          DOC.CODCOLIGADA,
+          DOC.DATAULTIMAATUALIZACAO,
+          DOC.EXPORTACAORESULTADO,
+          DOC.LOGINSTATUS,
+          DOC.DATASTATUS,
+          DOC.USUARIODERECEBIMENTO,
+          DOC.DATADERECEBIMENTO,
+          DOC.IDENTIFICADOR_ENTRADA,
+          A.CFOPSAIDA,
+          A.CONTRATO,
+          A.OPERACAO,
+          A.ORIGEM,
+          A.QUANTIDADEITEM,
+          A.INTEGRACAOSIGAVEI,
+          C.C02_CNPJ,
+          C.C03_XNOME,
+          E.E02_CNPJ,
+          E.E03_CPF,
+          E.E04_XNOME,
+          E5.E12_UF,
+          DOC.DATADECRIACAO,
+          DOC.DATAGERACAOMAPACEGO,
+          DOC.DATADERECEBIMENTO,
+          DOC.NOTAREGISTRADA,
+          A.A01_ID,
+          W03_VBC,
+          W04_VICMS,
+          W05_VBCST,
+          W06_VST,
+          W07_VPROD,
+          W08_VFRETE,
+          W09_VSEG,
+          W10_VDESC,
+          W11_VII,
+          W12_VIPI,
+          W13_VPIS,
+          W14_VCOFINS,
+          W15_VOUTRO,
+          W16_VNF,
+          C.C21_CRT,
+          B.B04_NATOP,
+          Z03_INFCPL
+ ORDER BY A.A01_ID --DOC.ID
