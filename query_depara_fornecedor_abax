@@ -1,0 +1,34 @@
+SELECT --top 100 --limitador para não buscar tudo. Se precisar é só tirar
+    
+    D.CODCOLIGADA as 'Coligada',
+    C.C02_CNPJ as 'Cnpj Fornecedor',
+    C.CODFORNECEDOR as 'Codigo-Fornecedor',
+    C.C03_XNOME as 'Nome-Fornecedor',
+    I.I02_CPROD as 'Código-Produto',
+    I.I04_XPROD as 'Descrição-Produto',
+    COUNT(*) AS QUANTIDADE,
+    DP.CODLOCAL as 'Código-Local',    
+    DP.FATOR as 'Fator'    
+
+FROM ZDW_I01_PROD I
+INNER JOIN ZDW_C01_EMIT C
+    ON C.A01_ID = I.A01_ID
+INNER JOIN ZDW_B01_IDE B
+    ON B.A01_ID = I.A01_ID
+INNER JOIN DOCUMENTO D
+    ON I.IDDOCUMENTO = D.ID
+LEFT JOIN DEPARAPRODUTO DP
+    ON DP.CODCOLIGADA = D.CODCOLIGADA
+   AND DP.CNPJ = C.C02_CNPJ
+   AND DP.CODFORNECEDOR = I.I02_CPROD   
+GROUP BY
+    C.CODFORNECEDOR,
+    D.CODCOLIGADA,
+    C.C02_CNPJ,
+    C.C03_XNOME,
+    I.I02_CPROD,
+    I.I04_XPROD,
+    DP.ID,
+    DP.CODLOCAL,
+    DP.FATOR,
+    DP.ATIVO;
